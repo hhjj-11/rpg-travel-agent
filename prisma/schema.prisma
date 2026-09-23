@@ -1,0 +1,142 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum AchievementBranch {
+  GOURMET
+  EXPLORER
+}
+
+enum AchievementStatus {
+  ACTIVE
+  INACTIVE
+}
+
+enum JournalType {
+  FOOD_CHECK_IN
+  GEO_SERENDIPITY
+  EXPLORATION_ROUTE
+  AI_STORY
+}
+
+enum FoodRecognitionStatus {
+  PENDING
+  ANALYZED
+  FAILED
+}
+
+enum GeoQuestStatus {
+  TRIGGERED
+  ACCEPTED
+  COMPLETED
+  EXPIRED
+}
+
+model User {
+  id        String   @id @default(cuid())
+  email     String?  @unique
+  username  String
+  avatarUrl String?
+
+  level     Int @default(1)
+  exp       Int @default(0)
+
+  vitality         Int @default(0)
+  exploration      Int @default(0)
+  happiness        Int @default(0)
+  flavorExperience Int @default(0)
+
+  nutrition             Int   @default(0)
+  curiosity             Int   @default(0)
+  baseSerendipity       Float @default(0.05)
+  currentSerendipity    Float @default(0.05)
+  digestiveDebuffImmune Boolean @default(false)
+
+  achievements      UserAchievement[]
+  adventureJournals AdventureJournal[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([username])
+}
+
+model Achievement {
+  id          String            @id @default(cuid())
+  code        String            @unique
+  name        String
+  title       String
+  branch      AchievementBranch
+  description String
+  condition   Json
+  buff         Json
+  status      AchievementStatus @default(ACTIVE)
+
+  users UserAchievement[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([branch])
+}
+
+model UserAchievement {
+  id            String @id @default(cuid())
+  userId        String
+  achievementId String
+
+  unlockedAt DateTime @default(now())
+  buffActive Boolean  @default(true)
+  buffState  Json?
+
+  user        User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  achievement Achievement @relation(fields: [achievementId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, achievementId])
+  @@index([achievementId])
+}
+
+model AdventureJournal {
+  id     String      @id @default(cuid())
+  userId String
+  type   JournalType
+
+  title     String
+  summary   String?
+  storyText String?
+
+  foodRecognitionStatus FoodRecognitionStatus?
+  foodName              String?
+  cuisine               String?
+  spices                String[] @default([])
+  imageUrl              String?
+
+  geoQuestStatus GeoQuestStatus?
+  locationName   String?
+  latitude       Float?
+  longitude      Float?
+  routePlan      Json?
+
+  expDelta              Int   @default(0)
+  vitalityDelta         Int   @default(0)
+  explorationDelta      Int   @default(0)
+  happinessDelta        Int   @default(0)
+  flavorExperienceDelta Int   @default(0)
+  nutritionDelta        Int   @default(0)
+  curiosityDelta        Int   @default(0)
+  serendipityDelta      Float @default(0)
+
+  metadata Json?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+
+  @@index([userId, createdAt])
+  @@index([type])
+}
