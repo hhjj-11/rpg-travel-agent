@@ -2,6 +2,8 @@
 
 A location-aware travel game prototype. It turns nearby places and user intent into optional RPG-style walking quests, a quest board, and a travel journal. This repository contains the **backend and a local test page**; it is not a complete mobile app.
 
+**My contribution:** I was responsible for backend development in the broader travel app. This repository focuses on that backend; it does not claim sole authorship of the full product or mobile UI.
+
 ## Why this project
 
 The design question is how a travel assistant can use context without interrupting the user every time their location changes. The current implementation combines intent gating, a cooldown, a probability-based encounter rule, nearby POI lookup, and story generation. It uses a deterministic local fallback when the map or model keys are absent so the API can be inspected without paid services. Fallback output is sample data, not evidence of live map or model performance.
