@@ -17,11 +17,10 @@ The design question is how a travel assistant can use context without interrupti
 
 ## Run locally
 
-Requires Node.js 20+. The verified local run reused the original project's installed dependencies. A fresh `npm ci` in a new environment has not been verified.
-
+Requires Node.js 20+. The verified local run reused the original project's installed dependencies. The GitHub Actions workflow runs `npm ci` from the repository lockfile in a clean runner.
 ```bash
 npm ci
-npm run build
+npm test
 npm start
 ```
 
@@ -31,7 +30,7 @@ The API has **no user authentication**. The included test page uses same-origin 
 
 ## Verified local behavior
 
-On 2026-09-24, `npm run build` passed. With no database, map key, or model key, the server returned:
+On 2026-09-24, `npm test` passed in the local fallback environment. It builds the TypeScript code and checks health, commission intent gating, coordinate validation, and sample quest board output through in-process HTTP requests. With no database, map key, or model key, the server returned:
 
 ```text
 GET /health -> {"status":"ok","service":"rpg-agent-backend","mode":"mock-without-database"}
